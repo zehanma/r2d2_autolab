@@ -1,15 +1,19 @@
 from cv2 import aruco
 
 # Robot Params #
-nuc_ip = ""
-robot_ip = ""
-sudo_password = ""
-robot_serial_number = ""
+nuc_ip = "172.16.0.4"
+robot_ip = "172.16.0.2"
+sudo_password = "iloverobots"
+robot_serial_number = "295341-1324688"
 
 # Camera ID's #
-hand_camera_id = ""
-varied_camera_1_id = ""
-varied_camera_2_id = ""
+hand_camera_id = "17225336"
+varied_camera_1_id = "25047636" #left
+varied_camera_2_id = "24013089" #right
+
+#hand_camera_id = ""
+#varied_camera_1_id = ""
+#varied_camera_2_id = ""
 
 # Charuco Board Params #
 CHARUCOBOARD_ROWCOUNT = 9
