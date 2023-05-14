@@ -95,4 +95,6 @@ class TimestepProcesser:
             action = np.concatenate([arm_action, [gripper_action]], dtype=self.action_dtype)
             processed_timestep["action"] = action
 
+        # processed_timestep["observation"]["camera"]["image"]["hand_camera"] is (2, 3, 128, 128)
+
         return processed_timestep

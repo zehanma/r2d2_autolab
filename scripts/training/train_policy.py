@@ -2,14 +2,14 @@ import json
 
 from r2d2.training.model_trainer import exp_launcher
 
-task_label_filepath = "/home/sasha/R2D2/scripts/labeling/task_label_filepath.json"
-with open(task_label_filepath, "r") as jsonFile:
-    task_labels = json.load(jsonFile)
+# task_label_filepath = "/home/sasha/R2D2/scripts/labeling/task_label_filepath.json"
+# with open(task_label_filepath, "r") as jsonFile:
+#     task_labels = json.load(jsonFile)
 
 
-def filter_func(h5_metadata, put_in_only=False):
-    put_in = task_labels.get(h5_metadata["time"], not put_in_only)
-    return put_in == put_in_only
+# def filter_func(h5_metadata, put_in_only=False):
+#     put_in = task_labels.get(h5_metadata["time"], not put_in_only)
+#     return put_in == put_in_only
 
 
 variant = dict(
@@ -44,11 +44,11 @@ variant = dict(
         batch_size=4,
         prefetch_factor=1,
         buffer_size=1000,
-        num_workers=4,
+        num_workers=1,
         data_filtering_kwargs=dict(
             train_p=0.9,
             remove_failures=True,
-            filter_func=filter_func,
+            # filter_func=filter_func,
         ),
         traj_loading_kwargs=dict(
             remove_skipped_steps=True,

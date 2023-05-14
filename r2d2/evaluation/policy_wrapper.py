@@ -61,3 +61,34 @@ class PolicyWrapper:
 
         # import pdb; pdb.set_trace()
         return np_action
+    
+
+class PolicyWrapperRobomimic:
+    def __init__(self, policy, timestep_filtering_kwargs, image_transform_kwargs, eval_mode=True):
+        self.policy = policy
+
+        assert eval_mode is True
+
+        # if eval_mode:
+        #     self.policy.eval()
+        # else:
+        #     self.policy.train()
+
+        self.timestep_processor = TimestepProcesser(
+            ignore_action=True, **timestep_filtering_kwargs, image_transform_kwargs=image_transform_kwargs
+        )
+
+    def forward(self, observation):
+        timestep = {"observation": observation}
+        processed_timestep = self.timestep_processor.forward(timestep)
+        torch_timestep = np_dict_to_torch_dict(processed_timestep)
+        action = self.policy(torch_timestep)[0]
+        np_action = action.detach().numpy()
+
+        # a_star = np.cumsum(processed_timestep['observation']['state']) / 7
+        # print('Policy Action: ', np_action)
+        # print('Expert Action: ', a_star)
+        # print('Error: ', np.abs(a_star - np_action).mean())
+
+        # import pdb; pdb.set_trace()
+        return np_action
