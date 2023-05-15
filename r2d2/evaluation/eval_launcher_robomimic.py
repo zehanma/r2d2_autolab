@@ -37,7 +37,8 @@ def eval_launcher(variant, run_id, exp_id):
     # policy = torch.load(policy_filepath)
 
     # load the policy, use hardcoded values for now
-    ckpt_path = "~/expdata/r2d2/im/bc_xfmr/05-13-pnp-redbull-try1/seed_1_ds_pnp-redbull/2023-05-13-18-13-24/models/model_epoch_100.pth"
+    # ckpt_path = "~/expdata/r2d2/im/bc_xfmr/05-13-pnp-redbull-try1/seed_1_ds_pnp-redbull/2023-05-13-18-13-24/models/model_epoch_200.pth"
+    ckpt_path = "~/expdata/r2d2/im/bc_xfmr/05-13-pnp-redbull-try1/seed_2_ds_pnp-redbull/2023-05-13-18-13-26/models/model_epoch_200.pth"
     device = TorchUtils.get_torch_device(try_to_use_cuda=True)
     policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=ckpt_path, device=device, verbose=True)
 

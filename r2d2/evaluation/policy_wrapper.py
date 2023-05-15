@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from collections import deque
 
 from r2d2.data_processing.timestep_processing import TimestepProcesser
 
@@ -95,33 +96,31 @@ class PolicyWrapperRobomimic:
         # print(observation["robot_state"].keys())
         # print(observation["image"].keys())
 
-        im = processed_timestep["observation"]["camera"]["image"]["hand_camera"][0]
+        im1 = processed_timestep["observation"]["camera"]["image"]["hand_camera"][0]
+        im2 = processed_timestep["observation"]["camera"]["image"]["varied_camera"][3]
+        im3 = processed_timestep["observation"]["camera"]["image"]["varied_camera"][0]
 
         obs = {
             "robot_state/cartesian_position": np.array(observation["robot_state"]["cartesian_position"]),
             "robot_state/gripper_position": np.array([observation["robot_state"]["gripper_position"]]),
             "robot_state/joint_positions": np.array(observation["robot_state"]["joint_positions"]),
-            "camera/image/hand_camera_image": im, #observation["image"]["25047636_left"],
-            "camera/image/varied_camera_left_image": im, #observation["image"]["25047636_left"],
-            "camera/image/varied_camera_right_image": im, #observation["image"]["25047636_left"],
+            "camera/image/hand_camera_image": im1, #observation["image"]["25047636_left"],
+            "camera/image/varied_camera_left_image": im2, #observation["image"]["25047636_left"],
+            "camera/image/varied_camera_right_image": im3, #observation["image"]["25047636_left"],
         }
         self.fs_wrapper.add_obs(obs)
-
-        for k in obs:
-            print(k, obs[k].shape)
 
         obs_history = self.fs_wrapper.get_obs_history()
         
         action = self.policy(obs_history)#[0]
         #np_action = action.detach().numpy()
-
         # a_star = np.cumsum(processed_timestep['observation']['state']) / 7
         # print('Policy Action: ', np_action)
         # print('Expert Action: ', a_star)
         # print('Error: ', np.abs(a_star - np_action).mean())
 
         # import pdb; pdb.set_trace()
-        return np_action
+        return action
     
 
 class FrameStackWrapper:
