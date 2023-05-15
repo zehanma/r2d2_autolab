@@ -58,6 +58,9 @@ def collect_data_folderpaths(filter_func=None, remove_failures=True):
     if remove_failures:
         data_dir = os.path.join(data_dir, "success")
 
+    # added by Soroush: only train on data from 2023-04-26 for now
+    data_dir = os.path.join(data_dir, "2023-04-26")
+
     # Collect #
     all_folderpaths = crawler(data_dir, filter_func=filter_func)
 

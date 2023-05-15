@@ -80,7 +80,6 @@ class TimestepProcesser:
 
                 for full_obs_id in sorted_obs_ids:
                     if serial_number in full_obs_id:
-                        print(serial_number, full_obs_id)
                         data = obs_type_dict[full_obs_id]
                         high_dim_state_dict[obs_type][cam_type].append(data)
 
