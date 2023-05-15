@@ -81,9 +81,32 @@ class PolicyWrapperRobomimic:
     def forward(self, observation):
         timestep = {"observation": observation}
         processed_timestep = self.timestep_processor.forward(timestep)
-        torch_timestep = np_dict_to_torch_dict(processed_timestep)
-        action = self.policy(torch_timestep)[0]
-        np_action = action.detach().numpy()
+        # torch_timestep = np_dict_to_torch_dict(processed_timestep)
+        
+        print(processed_timestep["observation"].keys())
+        print(processed_timestep["observation"]["camera"]["image"]["hand_camera"][0].shape)
+        # print(len(processed_timestep["observation"]["camera"]["image"]["varied_camera"]))
+        # print(processed_timestep["observation"]["state"].keys())
+        
+        # print(observation["robot_state"].keys())
+        # print(observation["image"].keys())
+
+        im = processed_timestep["observation"]["camera"]["image"]["hand_camera"][0]
+
+        obs = {
+            "robot_state/cartesian_position": np.array(observation["robot_state"]["cartesian_position"]),
+            "robot_state/gripper_position": np.array([observation["robot_state"]["gripper_position"]]),
+            "robot_state/joint_positions": np.array(observation["robot_state"]["joint_positions"]),
+            "camera/image/hand_camera_image": im, #observation["image"]["25047636_left"],
+            "camera/image/varied_camera_left_image": im, #observation["image"]["25047636_left"],
+            "camera/image/varied_camera_right_image": im, #observation["image"]["25047636_left"],
+        }
+
+        for k in obs:
+            print(k, obs[k].shape)
+        
+        action = self.policy(obs)#[0]
+        #np_action = action.detach().numpy()
 
         # a_star = np.cumsum(processed_timestep['observation']['state']) / 7
         # print('Policy Action: ', np_action)

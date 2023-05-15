@@ -4,7 +4,7 @@ import os
 import numpy as np
 import torch
 
-# from r2d2.controllers.oculus_controller import VRPolicy
+from r2d2.controllers.oculus_controller import VRPolicy
 from r2d2.evaluation.policy_wrapper import PolicyWrapperRobomimic
 from r2d2.robot_env import RobotEnv
 from r2d2.user_interface.data_collector import DataCollecter
@@ -80,7 +80,12 @@ def eval_launcher(variant, run_id, exp_id):
     # Prepare Environment #
     policy_action_space = policy_timestep_filtering_kwargs["action_space"]
 
-    camera_kwargs = variant.get("camera_kwargs", {})
+    # camera_kwargs = variant.get("camera_kwargs", {})
+    camera_kwargs = dict(
+        hand_camera=dict(image=True, concatenate_images=False, resolution=(128, 128), resize_func="cv2"),
+        varied_camera=dict(image=True, concatenate_images=False, resolution=(128, 128), resize_func="cv2"),
+    )
+    
     policy_camera_kwargs = {} #policy_variant.get("camera_kwargs", {})
     policy_camera_kwargs.update(camera_kwargs)
 
