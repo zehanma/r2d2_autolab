@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from collections import deque
+import time
 
 from r2d2.data_processing.timestep_processing import TimestepProcesser
 
@@ -83,44 +84,55 @@ class PolicyWrapperRobomimic:
             ignore_action=True, **timestep_filtering_kwargs, image_transform_kwargs=image_transform_kwargs
         )
 
+        # import os
+        # import imageio
+        # video_path = os.path.expanduser("~/tmp/debug.mp4")
+        # self.video_writer = imageio.get_writer(video_path, fps=5)
+
     def forward(self, observation):
+        t1 = time.time()
         timestep = {"observation": observation}
         processed_timestep = self.timestep_processor.forward(timestep)
         # torch_timestep = np_dict_to_torch_dict(processed_timestep)
-        
-        print(processed_timestep["observation"].keys())
-        print(processed_timestep["observation"]["camera"]["image"]["hand_camera"][0].shape)
-        # print(len(processed_timestep["observation"]["camera"]["image"]["varied_camera"]))
-        # print(processed_timestep["observation"]["state"].keys())
-        
-        # print(observation["robot_state"].keys())
-        # print(observation["image"].keys())
+        # print("obs process time1:", time.time() - t1)
 
-        im1 = processed_timestep["observation"]["camera"]["image"]["hand_camera"][0]
-        im2 = processed_timestep["observation"]["camera"]["image"]["varied_camera"][3]
-        im3 = processed_timestep["observation"]["camera"]["image"]["varied_camera"][0]
+        t2 = time.time()
+        im1 = processed_timestep["observation"]["camera"]["image"]["hand_camera"][0] #observation["image"]["25047636_left"],
+        im2 = processed_timestep["observation"]["camera"]["image"]["varied_camera"][3] #observation["image"]["25047636_left"],
+        im3 = processed_timestep["observation"]["camera"]["image"]["varied_camera"][0] #observation["image"]["25047636_left"],
 
         obs = {
             "robot_state/cartesian_position": np.array(observation["robot_state"]["cartesian_position"]),
             "robot_state/gripper_position": np.array([observation["robot_state"]["gripper_position"]]),
-            "robot_state/joint_positions": np.array(observation["robot_state"]["joint_positions"]),
-            "camera/image/hand_camera_image": im1, #observation["image"]["25047636_left"],
-            "camera/image/varied_camera_left_image": im2, #observation["image"]["25047636_left"],
-            "camera/image/varied_camera_right_image": im3, #observation["image"]["25047636_left"],
+            "camera/image/hand_camera_image": im1,
+            # "camera/image/varied_camera_left_image": im2,
+            "camera/image/varied_camera_right_image": im3,
         }
-        self.fs_wrapper.add_obs(obs)
-
-        obs_history = self.fs_wrapper.get_obs_history()
         
-        action = self.policy(obs_history)#[0]
-        #np_action = action.detach().numpy()
-        # a_star = np.cumsum(processed_timestep['observation']['state']) / 7
-        # print('Policy Action: ', np_action)
-        # print('Expert Action: ', a_star)
-        # print('Error: ', np.abs(a_star - np_action).mean())
+        self.fs_wrapper.add_obs(obs)
+        obs_history = self.fs_wrapper.get_obs_history()
+        # print("obs process time2:", time.time() - t2)
 
-        # import pdb; pdb.set_trace()
+        # obs_history = obs
+
+        # for im in obs_history["camera/image/hand_camera_image"]:
+        #     im = np.array(im)
+        #     im = np.moveaxis(im, 0, -1)
+        #     im = (im * 255).astype(np.uint8)
+        #     self.video_writer.append_data(im)
+        
+        t1 = time.time()
+        action = self.policy(obs_history)#[0]
+
+        # clip action
+        action = np.clip(action, a_min=-1, a_max=1)
+        # print("run policy:", int(1000 * (time.time() - t1)))
+
         return action
+
+    def reset(self):
+        self.fs_wrapper.reset()
+        self.policy.start_episode()
     
 
 class FrameStackWrapper:
